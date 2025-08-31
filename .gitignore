@@ -29,5 +29,4 @@ node_modules
 .lock-wscript
 
 # gh-pages
-web
 web_dist

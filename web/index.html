@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lyric/Instrument Tapper</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="left">
+      <h1>Tapper</h1>
+      <label>Title <input id="title" type="text" /></label>
+      <label>Audio URL <input id="audio-url" type="text" /></label>
+      <label>Audio File <input id="audio-file" type="file" accept="audio/*" /></label>
+      <label>Countdown (sec) <input id="countdown" type="number" value="3" /></label>
+      <label>Latency (ms) <input id="latency" type="number" value="0" /></label>
+      <label>Mode
+        <select id="mode">
+          <option value="hold">Hold</option>
+          <option value="tap">Tap</option>
+        </select>
+      </label>
+      <label>Active Track
+        <select id="active-track">
+          <option value="lyrics">Lyrics</option>
+          <option value="kick">Kick</option>
+          <option value="snare">Snare</option>
+          <option value="guitar">Guitar</option>
+          <option value="extra">Extra</option>
+        </select>
+      </label>
+      <button id="load-audio">Load audio</button>
+      <button id="start">Start + Countdown</button>
+      <button id="stop">Stop</button>
+      <audio id="audio" controls></audio>
+      <textarea id="lyrics" placeholder="Paste lyrics here"></textarea>
+      <div class="row">
+        <button id="map">Map to taps</button>
+        <button id="clear-lyrics">Clear</button>
+      </div>
+      <div class="row">
+        <button id="import-json">Import JSON</button>
+        <button id="export-json">Export JSON</button>
+        <button id="export-csv">Export CSV</button>
+        <button id="reset">Reset</button>
+      </div>
+      <div id="status"></div>
+    </div>
+    <div id="right">
+      <div id="clock">Now: 0.000s</div>
+      <div id="waveform"></div>
+      <div id="preview"></div>
+      <div id="nudge">
+        <button data-d="-0.05">-50ms</button>
+        <button data-d="-0.005">-5ms</button>
+        <button data-d="-0.001">-1ms</button>
+        <button data-d="0.001">+1ms</button>
+        <button data-d="0.005">+5ms</button>
+        <button data-d="0.05">+50ms</button>
+      </div>
+      <table id="events"><thead><tr><th>Track</th><th>t0</th><th>t1</th><th>dur</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+  <script src="../dist/tappy.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
