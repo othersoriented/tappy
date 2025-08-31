@@ -1,0 +1,17 @@
+body{font-family:sans-serif;color:#eee;background:#222;margin:0;display:flex;justify-content:center}
+#app{display:flex;width:100%;max-width:1200px}
+#left,#right{padding:10px}
+#left{width:300px;background:#333}
+#left label{display:block;margin:4px 0}
+#left input,#left select,#left textarea{width:100%}
+#left textarea{height:100px}
+.row{margin:5px 0}
+button{margin:2px}
+#right{flex:1;background:#111}
+#waveform{background:#000;width:100%}
+#preview{margin:10px 0;min-height:24px}
+#preview .active{color:#0f0}
+#events{width:100%;max-height:200px;overflow:auto}
+#events td,#events th{padding:2px 4px;border-bottom:1px solid #444}
+#clock{margin-bottom:5px}
+#nudge{margin-top:5px}
