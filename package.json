@@ -43,6 +43,7 @@
     "vinyl-source-stream": "^1.0.0"
   },
   "dependencies": {
-    "right-now": "^1.0.0"
+    "right-now": "^1.0.0",
+    "wavesurfer.js": "^7.10.1"
   }
 }

@@ -29,10 +29,19 @@
           <option value="extra">Extra</option>
         </select>
       </label>
+      <div class="row">
+        <button id="undo">Undo (Backspace)</button>
+      </div>
       <button id="load-audio">Load audio</button>
       <button id="start">Start + Countdown</button>
       <button id="stop">Stop</button>
-      <audio id="audio" controls></audio>
+      <div class="row">
+        <label>Back up (sec)
+          <input id="backup-sec" type="number" value="3" min="1" step="1" />
+        </label>
+        <button id="backup-btn" title="Rewind and trim recent events (R)">Back up + Trim</button>
+      </div>
+      <audio id="audio" controls preload="metadata"></audio>
       <textarea id="lyrics" placeholder="Paste lyrics here"></textarea>
       <div class="row">
         <button id="map">Map to taps</button>
@@ -48,6 +57,23 @@
     </div>
     <div id="right">
       <div id="clock">Now: 0.000s</div>
+      <div id="preview-controls" class="row">
+        <button id="play-toggle">Play/Pause</button>
+        <button id="preview-mapped">Preview mapped lyrics</button>
+      </div>
+      <div id="capture-area" class="row" title="Use this big button on mobile or with mouse to capture">
+        <button id="capture-btn">Hold/Tap Here</button>
+        <div class="track-btns" aria-label="Instrument taps (tap mode)">
+          <button id="kick-btn" title="Kick (1)">Kick</button>
+          <button id="snare-btn" title="Snare (2)">Snare</button>
+          <button id="guitar-btn" title="Guitar (3)">Guitar</button>
+          <button id="extra-btn" title="Extra (4)">Extra</button>
+        </div>
+      </div>
+      <div id="live" class="row" aria-live="polite" title="Live capture view">
+        <div id="live-status"></div>
+        <div id="live-lyrics"></div>
+      </div>
       <canvas id="waveform" width="800" height="120"></canvas>
       <div id="preview"></div>
       <div id="nudge">
@@ -62,6 +88,10 @@
     </div>
   </div>
   <script src="../dist/tappy.min.js"></script>
-  <script type="module" src="app.js"></script>
+  <!-- Classic scripts (no modules) so it works over file:// -->
+  <script src="mapping.js"></script>
+  <script src="storage.js"></script>
+  <script src="waveform.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

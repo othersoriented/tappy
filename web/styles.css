@@ -1,17 +1,40 @@
-body{font-family:sans-serif;color:#eee;background:#222;margin:0;display:flex;justify-content:center}
-#app{display:flex;width:100%;max-width:1200px}
-#left,#right{padding:10px}
-#left{width:300px;background:#333}
-#left label{display:block;margin:4px 0}
-#left input,#left select,#left textarea{width:100%}
-#left textarea{height:100px}
-.row{margin:5px 0}
-button{margin:2px}
-#right{flex:1;background:#111}
-#waveform{background:#000;width:100%}
-#preview{margin:10px 0;min-height:24px}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#e6e6e6;background:#1f1f22;margin:0;display:flex;justify-content:center;min-height:100vh;overflow-x:hidden}
+#app{display:flex;gap:16px;width:100%;max-width:1200px;padding:16px}
+#left,#right{padding:12px;border-radius:10px}
+#left{width:320px;background:#2a2d31;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+#left label{display:block;margin:6px 0;font-size:12px;color:#b8bec6}
+#left input,#left select,#left textarea{width:100%;margin-top:4px;background:#1e2126;border:1px solid #3a3f46;color:#e6e6e6;border-radius:6px;padding:8px}
+#left textarea{height:110px}
+.row{margin:8px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{margin:0;padding:8px 10px;border:1px solid #3a3f46;border-radius:6px;background:#343a40;color:#e6e6e6;cursor:pointer}
+button:hover{background:#3c434b}
+#right{flex:1;background:#17181b;box-shadow:0 1px 2px rgba(0,0,0,.3);overflow-x:hidden}
+#waveform{background:#0b0b0c;width:100%;border-radius:6px}
+#preview{margin:10px 0;min-height:24px;display:flex;flex-wrap:wrap;gap:6px;line-height:1.6;word-break:break-word}
+#preview span{display:inline-block}
 #preview .active{color:#0f0}
-#events{width:100%;max-height:200px;overflow:auto}
+#live{margin:6px 0}
+#live-status{font-size:12px;color:#aaa;margin-bottom:2px}
+#live-lyrics{min-height:22px;display:flex;flex-wrap:wrap;gap:6px;line-height:1.6}
+#live-lyrics span{margin-right:0}
+#live-lyrics .done{color:#7fbf7f}
+#live-lyrics .current{color:#fff;background:#444;padding:2px 3px;border-radius:3px}
+#live-lyrics .over{color:#ff8080}
+#events{width:100%;max-height:220px;overflow:auto;display:block}
 #events td,#events th{padding:2px 4px;border-bottom:1px solid #444}
 #clock{margin-bottom:5px}
 #nudge{margin-top:5px}
+
+/* Capture area for mobile/desktop mouse */
+#capture-area{align-items:stretch}
+#capture-btn{flex:1;min-height:64px;font-size:20px;font-weight:600}
+#capture-btn{touch-action:none;user-select:none}
+.track-btns{display:flex;gap:6px;flex-wrap:wrap}
+.track-btns button{font-size:12px;padding:6px 8px}
+
+/* Responsive layout for mobile */
+@media (max-width: 900px){
+  #app{flex-direction:column}
+  #left{width:auto}
+}

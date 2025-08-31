@@ -41,11 +41,6 @@ const els={
   previewMappedBtn:document.getElementById('preview-mapped'),
   backupSec:document.getElementById('backup-sec'),
   backupBtn:document.getElementById('backup-btn'),
-  captureBtn:document.getElementById('capture-btn'),
-  kickBtn:document.getElementById('kick-btn'),
-  snareBtn:document.getElementById('snare-btn'),
-  guitarBtn:document.getElementById('guitar-btn'),
-  extraBtn:document.getElementById('extra-btn'),
   liveStatus:document.getElementById('live-status'),
   liveLyrics:document.getElementById('live-lyrics')
 };
@@ -57,7 +52,7 @@ els.loadBtn.onclick=()=>loadAudio({file:els.file.files[0], url:els.url.value});
 els.startBtn.onclick=()=>start(parseInt(els.countdown.value||'0',10));
 els.stopBtn.onclick=stop;
 els.mapBtn.onclick=()=>{try{map();}catch(e){els.status.textContent=e.message;}};
-els.clearLyrics.onclick=()=>{els.lyrics.value=''; clearMapping(); renderLiveCapture(); updateTable();};
+els.clearLyrics.onclick=()=>{els.lyrics.value='';};
 els.importBtn.onclick=()=>{
   const txt=prompt('Paste JSON');
   if(!txt) return; try{importJSON(state,JSON.parse(txt));updateTable();}catch(e){alert('Invalid JSON');}
@@ -79,15 +74,6 @@ els.previewMappedBtn.onclick=()=>{
 };
 els.lyrics.addEventListener('input',()=>{ renderLiveCapture(); });
 els.backupBtn.addEventListener('click',()=>{ backUpAndTrim(); });
-// On-screen hold/tap button (mobile + mouse)
-els.captureBtn.addEventListener('pointerdown',(e)=>{ e.preventDefault(); onCaptureDown(); });
-els.captureBtn.addEventListener('pointerup',(e)=>{ e.preventDefault(); onCaptureUp(); });
-els.captureBtn.addEventListener('pointercancel',(e)=>{ e.preventDefault(); onCaptureCancel(); });
-// On-screen instrument taps for tap mode
-els.kickBtn.addEventListener('click',()=>instrumentTap('kick'));
-els.snareBtn.addEventListener('click',()=>instrumentTap('snare'));
-els.guitarBtn.addEventListener('click',()=>instrumentTap('guitar'));
-els.extraBtn.addEventListener('click',()=>instrumentTap('extra'));
 
 // Convenience: auto-load when a file is picked or Enter in URL
 els.file.addEventListener('change',()=>{
@@ -120,8 +106,6 @@ function loadAudio({file,url}){
     audio.onerror=(e)=>{ els.status.textContent='Audio load error (CORS/URL/autoplay). Try a local file.'; reject(e); };
     // Ensure browser starts fetching metadata immediately
     try{ audio.load(); }catch(_){ }
-    // Clear previous captures/mapping when a new audio is loaded
-    clearCapturesAndMapping();
   });
 }
 
@@ -141,7 +125,6 @@ function start(count){
 }
 function begin(){
   recording=true; state.tracks={lyrics:[],kick:[],snare:[],guitar:[],extra:[]};
-  clearMapping();
   audio.currentTime=0;
   // Attempt to start playback. If blocked, instruct the user to click Play.
   const p=audio.play();
@@ -157,17 +140,11 @@ function stop(){ recording=false; audio.pause(); }
 
 document.addEventListener('keydown',e=>{
   if(!recording) return;
-  const tag=(e.target && e.target.tagName)||'';
-  if(tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT') return;
   if(e.code==='Space'){
     e.preventDefault();
-    if(e.repeat) return; // ignore auto-repeat while holding
     const t=clampTime(audio.currentTime+state.meta.latencyMs/1000, state.meta.duration||Number.MAX_SAFE_INTEGER);
-    if(state.meta.mode==='hold'){
-      if(lastSpace==null){ lastSpace=t; } // start only once
-    } else {
-      state.tracks.lyrics.push({t});
-    }
+    if(state.meta.mode==='hold'){ lastSpace=t; }
+    else state.tracks.lyrics.push({t});
     updateTable();
     renderLiveCapture();
   } else if(state.meta.mode==='tap'){
@@ -314,7 +291,7 @@ function renderLiveCapture(){
   const frag=document.createDocumentFragment();
 
   if(total){
-    let status = "Mapped "+Math.min(doneCount,total)+" / "+total;
+    let status = `Mapped ${Math.min(doneCount,total)} / ${total}`;
     if(capturingNow && doneCount < total){
       status += ` — capturing: "${words[doneCount]}"`;
     } else if(doneCount < total){
@@ -336,72 +313,4 @@ function renderLiveCapture(){
   }
   els.liveLyrics.innerHTML='';
   els.liveLyrics.appendChild(frag);
-}
-
-// Rewind a few seconds and trim captured events after the new time
-function backUpAndTrim(){
-  const sec=parseFloat(els.backupSec.value||'3');
-  const now=audio.currentTime;
-  const target=Math.max(0, now - Math.max(1, sec));
-  audio.currentTime=target;
-  const dur=state.meta.duration||Number.MAX_SAFE_INTEGER;
-  const cut=Math.min(target, dur);
-  if(state.meta.mode==='hold'){
-    state.tracks.lyrics = (state.tracks.lyrics||[]).map(seg=>{
-      const s={...seg};
-      if(s.t0>cut) return null;
-      if(s.t1>cut) s.t1=cut;
-      return s;
-    }).filter(Boolean);
-    if(lastSpace!=null && lastSpace>cut){ lastSpace=null; }
-  } else {
-    state.tracks.lyrics = (state.tracks.lyrics||[]).filter(ev=>ev.t<=cut);
-  }
-  ['kick','snare','guitar','extra'].forEach(k=>{
-    state.tracks[k]=(state.tracks[k]||[]).filter(ev=>ev.t<=cut);
-  });
-  updateTable();
-  renderLiveCapture();
-  if(recording){ const p=audio.play(); if(p&&p.catch) p.catch(()=>{}); }
-  els.status.textContent='Backed up '+Math.round((now-target)*1000)+'ms. Trimmed to '+target.toFixed(3)+'s.';
-}
-
-// Helpers
-function clearMapping(){
-  state.mapped.words=[];
-  setSelected(-1);
-  els.preview.innerHTML='';
-}
-function clearCapturesAndMapping(){
-  state.tracks={lyrics:[],kick:[],snare:[],guitar:[],extra:[]};
-  clearMapping();
-  updateTable();
-  renderLiveCapture();
-}
-function onCaptureDown(){
-  if(!recording) return;
-  const t=clampTime(audio.currentTime+state.meta.latencyMs/1000, state.meta.duration||Number.MAX_SAFE_INTEGER);
-  if(state.meta.mode==='hold'){
-    if(lastSpace==null){ lastSpace=t; }
-  } else {
-    state.tracks.lyrics.push({t});
-    updateTable();
-    renderLiveCapture();
-  }
-}
-function onCaptureUp(){
-  if(!recording) return;
-  if(state.meta.mode==='hold' && lastSpace!=null){
-    const t1=clampTime(audio.currentTime+state.meta.latencyMs/1000, state.meta.duration||Number.MAX_SAFE_INTEGER);
-    state.tracks.lyrics.push({t0:lastSpace,t1});
-    lastSpace=null; updateTable(); renderLiveCapture();
-  }
-}
-function onCaptureCancel(){
-  if(state.meta.mode==='hold' && lastSpace!=null){ lastSpace=null; renderLiveCapture(); }
-}
-function instrumentTap(name){
-  if(!recording || state.meta.mode!=='tap') return;
-  const t=clampTime(audio.currentTime+state.meta.latencyMs/1000, state.meta.duration||Number.MAX_SAFE_INTEGER);
-  state.tracks[name].push({t}); updateTable();
 }
